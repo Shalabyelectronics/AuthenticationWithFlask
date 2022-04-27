@@ -31,7 +31,12 @@ def home():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        print(request.form.get('name'))
+        new_user = User(name=request.form.get('name'),
+                        email=request.form.get('email'),
+                        password=request.form.get('password'))
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('secrets', username=request.form.get('name')))
     return render_template("register.html")
 
 
@@ -42,7 +47,8 @@ def login():
 
 @app.route('/secrets')
 def secrets():
-    return render_template("secrets.html")
+    name = request.args['username']
+    return render_template("secrets.html", username=name)
 
 
 @app.route('/logout')
