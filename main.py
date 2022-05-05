@@ -33,7 +33,7 @@ def register():
     if request.method == "POST":
         new_user = User(name=request.form.get('name'),
                         email=request.form.get('email'),
-                        password=request.form.get('password'))
+                        password=generate_password_hash(request.form.get('password'),"pbkdf2:sha256",8))
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('secrets', username=request.form.get('name')))
@@ -52,7 +52,7 @@ def login():
         password = request.form.get('password')
         check_user = db.session.query(User).filter(User.email == email).first()
         if check_user:
-            if check_user.password == password:
+            if check_password_hash(check_user.password, password):
                 return redirect(url_for('secrets', username=check_user.name))
     return render_template("login.html")
 
