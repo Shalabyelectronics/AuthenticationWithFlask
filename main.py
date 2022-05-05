@@ -1,14 +1,17 @@
 from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
+import secrets
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = '0f01f3b4733d44837234f64dd0757a7f'
+app.config['SECRET_KEY'] = secrets.token_hex(16)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 
 ##CREATE TABLE IN DB
@@ -33,7 +36,7 @@ def register():
     if request.method == "POST":
         new_user = User(name=request.form.get('name'),
                         email=request.form.get('email'),
-                        password=generate_password_hash(request.form.get('password'),"pbkdf2:sha256",8))
+                        password=generate_password_hash(request.form.get('password'), "pbkdf2:sha256", 8))
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('secrets', username=request.form.get('name')))
