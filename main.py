@@ -40,8 +40,20 @@ def register():
     return render_template("register.html")
 
 
-@app.route('/login')
+@app.route("/download", methods=["GET", "POST"])
+def download():
+    return send_from_directory('static/files', 'cheat_sheet.pdf')
+
+
+@app.route('/login', methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+        check_user = db.session.query(User).filter(User.email == email).first()
+        if check_user:
+            if check_user.password == password:
+                return redirect(url_for('secrets', username=check_user.name))
     return render_template("login.html")
 
 
@@ -53,11 +65,6 @@ def secrets():
 
 @app.route('/logout')
 def logout():
-    pass
-
-
-@app.route('/download')
-def download():
     pass
 
 
