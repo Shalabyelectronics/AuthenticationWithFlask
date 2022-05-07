@@ -74,11 +74,14 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
-        if user and check_password_hash(user.password, password):
-            login_user(user)
-            return redirect(next_page) if next_page else redirect(url_for('secrets'))
+        if user:
+            if check_password_hash(user.password, password):
+                login_user(user)
+                return redirect(next_page) if next_page else redirect(url_for('secrets'))
+            else:
+                flash("Login unsuccessful. please check password", "danger")
         else:
-            flash("Login unsuccessful. please check email and password", "danger")
+            flash("Login unsuccessful. please check email", "danger")
     return render_template("login.html")
 
 
