@@ -36,6 +36,8 @@ def home():
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for("secrets"))
     if request.method == "POST":
         check_user_by_email = User.query.filter_by(email=request.form.get('email')).first()
         if check_user_by_email:
@@ -59,6 +61,8 @@ def download():
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("secrets"))
     if request.method == "POST":
         email = request.form.get('email')
         password = request.form.get('password')
