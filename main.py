@@ -26,7 +26,7 @@ class User(UserMixin, db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return User.query.get(user_id)
 
 
 @app.route('/')
@@ -49,7 +49,6 @@ def register():
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
-            load_user(new_user.id)
             return redirect(url_for('secrets'))
     return render_template("register.html")
 
