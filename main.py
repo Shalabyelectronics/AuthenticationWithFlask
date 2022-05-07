@@ -10,8 +10,7 @@ app.config['SECRET_KEY'] = secrets.token_hex(16)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-login_manager = LoginManager()
-login_manager.init_app(app)
+login_manager = LoginManager(app)
 
 
 ##CREATE TABLE IN DB
@@ -25,6 +24,10 @@ class User(UserMixin, db.Model):
 # Line below only required once, when creating DB.
 # db.create_all()
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 
 @app.route('/')
 def home():
@@ -34,12 +37,18 @@ def home():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        new_user = User(name=request.form.get('name'),
-                        email=request.form.get('email'),
-                        password=generate_password_hash(request.form.get('password'), "pbkdf2:sha256", 8))
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('secrets', username=request.form.get('name')))
+        check_user_by_email = User.query.filter_by(email=request.form.get('email')).first()
+        if check_user_by_email:
+            flash("This email is already taken, or you can ")
+        else:
+            new_user = User(name=request.form.get('name'),
+                            email=request.form.get('email'),
+                            password=generate_password_hash(request.form.get('password'), "pbkdf2:sha256", 8))
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user)
+            load_user(new_user.id)
+            return redirect(url_for('secrets'))
     return render_template("register.html")
 
 
@@ -53,17 +62,17 @@ def login():
     if request.method == "POST":
         email = request.form.get('email')
         password = request.form.get('password')
-        check_user = db.session.query(User).filter(User.email == email).first()
-        if check_user:
-            if check_password_hash(check_user.password, password):
-                return redirect(url_for('secrets', username=check_user.name))
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('secrets'))
+        flash("Login unsuccessful. please check email and password", "danger")
     return render_template("login.html")
 
 
-@app.route('/secrets')
+@app.route('/secrets', methods=["GET", "POST"])
 def secrets():
-    name = request.args['username']
-    return render_template("secrets.html", username=name)
+    return render_template("secrets.html")
 
 
 @app.route('/logout')
