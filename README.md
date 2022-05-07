@@ -3,7 +3,7 @@ Here with this project we are going to learn Authentication with Flask So have F
 
 ## Project overview
 
-add gif showing the project
+![project_overview](https://user-images.githubusercontent.com/57592040/167265729-29c3fd07-41f9-49d3-ac2f-8808c427a780.gif)
 
 In this overview we can see how we login , register and logout and how the user need to be login to get to the secret page and download the pdf file as well, plus how the home page changed as current user is already login or logout.
 
