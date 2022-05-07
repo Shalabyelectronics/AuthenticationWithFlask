@@ -11,6 +11,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
+login_manager.login_view = "login"
 
 
 ##CREATE TABLE IN DB
@@ -54,6 +55,7 @@ def register():
 
 
 @app.route("/download", methods=["GET", "POST"])
+@login_required
 def download():
     return send_from_directory('static/files', 'cheat_sheet.pdf')
 
@@ -68,14 +70,23 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
-            return redirect(url_for('secrets'))
+            next_page = request.args.get("next")
+            print(next_page)
+            return redirect(next_page) if next_page else redirect(url_for('secrets'))
         flash("Login unsuccessful. please check email and password", "danger")
     return render_template("login.html")
 
 
-@app.route('/secrets', methods=["GET", "POST"])
+@app.route('/secrets')
+@login_required
 def secrets():
     return render_template("secrets.html")
+
+
+@app.route('/account')
+@login_required
+def account():
+    return render_template("account.html")
 
 
 @app.route('/logout')
