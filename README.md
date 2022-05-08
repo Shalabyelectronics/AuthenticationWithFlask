@@ -18,3 +18,7 @@ In this overview we can see how we login , register and logout and how the user 
 #### secure your users passwords by using `werkzeug.security` tools 
 
 In sample way we need to save our users passwords encrypted in our database instead of saving them as plan text so if our database stolen by bad guys at least the need ages to decrypting our users passwords and to do so we are going to use `generate_password_hash` function from `werkzeug.security` library 
+
+The concept about encrypting passwords or secret messages called Cryptography and it come from a Greece and it mean hidden writing if you like to know more about the history of Cryptography I recommend you to watch this video:
+
+[![IMAGE ALT TEXT HERE](https://1do0x210e15c8plg913c4zhy-wpengine.netdna-ssl.com/wp-content/uploads/cryptography-scaled-e1593335036543.jpg)](https://youtu.be/jhXCTbFnK8o)
