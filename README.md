@@ -163,12 +163,36 @@ def secrets():
 def account():
     return render_template("account.html")
 ```
+Also we can redirect the user to the page that tried to access before login by getting next key as below:
+```py
+global next_page
+@app.route('/login', methods=["GET", "POST"])
+def login():
+    global next_page
+    if current_user.is_authenticated:
+        return redirect(url_for("secrets"))
+    if request.method == "GET":
+        next_page = request.args.get("next")
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user = User.query.filter_by(email=email).first()
+        if user:
+            if check_password_hash(user.password, password):
+                login_user(user)
+                return redirect(next_page) if next_page else redirect(url_for('secrets'))
+            else:
+                flash("Login unsuccessful. please check password", "danger")
+        else:
+            flash("Login unsuccessful. please check email", "danger")
+    return render_template("login.html")
+```
 
 #### **What is current_user instance ?**
 
 current_user instance will use UserMixin attributes that we explained before and we will use is_authenticated attribute to check if the user is already authenticated  or not and it will help us to update our web page to change some options like if the user is authenticated  , the user won't see login or register button and will see logout button instead.
 
-**Add gif** 
+
 
 and inside the base.html page we need to add this functionality to preform the explained result as below:
 
