@@ -146,6 +146,11 @@ def login():
 
 login_required will block specific pages that have `@login_required` decorator so any unauthenticated user can not access any pages that need to be login to access them.
 
+We need first to configure the login view route so it will redirect the user to this page if the user not authenticated as below.
+```python
+login_manager.login_view = "login"
+```
+
 ![login_restriction](https://user-images.githubusercontent.com/57592040/167367119-65f09def-7977-42d6-9a8a-bcb5fd34849e.gif)
 
 
